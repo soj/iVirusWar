@@ -453,6 +453,23 @@ static int Map[100] = {
 	
 }
 
+-(int)findSmallest:(int)a :(int)b :(int)c
+{
+    int lesser;
+
+    if (a > b) {
+        lesser = b;
+    } else {
+        lesser = a;
+    }
+    
+    if (lesser > c) {
+        lesser = c;
+    }
+
+    return lesser;
+}
+
 -(NSMutableArray *)fillSecondMovesArrays:(int)side
 {
 	int m,n,realPos,newPos,newPos3,sumPos;
@@ -485,6 +502,8 @@ static int Map[100] = {
 				for (PathFindNode *thirdFirstMove in firstMoves) {
 					if (thirdFirstMove->nodePos!=oneFirstMove->nodePos && thirdFirstMove->nodePos!=secondFirstMove->nodePos) {
 						sumPos=oneFirstMove->nodePos+secondFirstMove->nodePos+thirdFirstMove->nodePos;
+                        
+                        //int arrayNumber = [self findSmallest:oneFirstMove->nodePos :secondFirstMove->nodePos :thirdFirstMove->nodePos];
 						
 						if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
 							mLine=[MoveLine line];
@@ -593,7 +612,13 @@ static int Map[100] = {
 		oppside = COMP_PLAYER;
 	}
 	
+    NSDate *date = [NSDate date];
+    
 	NSMutableArray *allLines=[self fillSecondMovesArrays:side];
+    
+    NSDate *date2 = [NSDate date];
+    NSLog(@"%f",[date2 timeIntervalSinceDate:date]);
+    
 	
 //	[self reportLines:allLines side:side];
 		
