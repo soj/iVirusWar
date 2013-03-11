@@ -98,6 +98,28 @@ static int Map[100] = {
 {
 	return [[MoveLine alloc] init];
 }
+
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:self.class]) {
+        return NO;
+    }
+    
+    MoveLine * other = object;
+    return self->posSum == other->posSum;
+}
+
+- (NSUInteger)hash
+{
+    // Based upon standard hash algorithm ~ http://stackoverflow.com/a/4393493/337735
+    NSUInteger result = 1;
+    NSUInteger prime = 31;
+
+    result = prime*result+self->posSum;
+    
+    return result;
+}
+
 @end
 
 /*********************************************************************************/
@@ -505,7 +527,7 @@ static int Map[100] = {
                         
                         //int arrayNumber = [self findSmallest:oneFirstMove->nodePos :secondFirstMove->nodePos :thirdFirstMove->nodePos];
 						
-						if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
+//						if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
 							mLine=[MoveLine line];
 							
 							mLine->Pos1=oneFirstMove->nodePos;
@@ -514,8 +536,8 @@ static int Map[100] = {
 							mLine->posSum=sumPos;
 							
 							[secondMoves addObject:mLine];
-							
-						}
+
+//						}
 					}
 				}
 			}
@@ -541,7 +563,7 @@ static int Map[100] = {
 							
 							sumPos=oneFirstMove->nodePos+[self unmapPosition:newPos]+thirdFirstMove->nodePos;
 							
-							if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
+//							if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
 								mLine=[MoveLine line];
 								
 								mLine->Pos1=oneFirstMove->nodePos;
@@ -551,7 +573,7 @@ static int Map[100] = {
 								
 								[secondMoves addObject:mLine];
 								
-							}
+//							}
 						}
 					}
 					
@@ -564,7 +586,7 @@ static int Map[100] = {
 								
 								sumPos=oneFirstMove->nodePos+[self unmapPosition:newPos]+[self unmapPosition:newPos3];
 								
-								if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
+//								if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
 									
 									mLine=[MoveLine line];
 									
@@ -575,7 +597,7 @@ static int Map[100] = {
 									
 									
 									[secondMoves addObject:mLine];
-								}
+//								}
 							}
 						}
 					}
@@ -587,9 +609,24 @@ static int Map[100] = {
 	
 	
 //	[self testMoves2:secondMoves];
+    
+    NSMutableArray *array = [self removeDuplicates:secondMoves];
 	
-	return (secondMoves);	
+	return (array);
 	
+}
+
+-(NSMutableArray *)removeDuplicates:(NSMutableArray*)originalArray
+{
+    NSMutableSet* existingNames = [NSMutableSet set];
+    NSMutableArray* filteredArray = [NSMutableArray array];
+    for (id object in originalArray) {
+        if (![existingNames member:object]) {
+            [existingNames addObject:object];
+            [filteredArray addObject:object];
+        }
+    }
+    return filteredArray;
 }
 
 
@@ -629,6 +666,8 @@ static int Map[100] = {
 //	for (m=0;m<countLines;m++) {		
 
 	for (MoveLine *mLine in allLines) {
+        
+        @autoreleasepool {
 
 		if ([startDate timeIntervalSinceNow] < -1500)  break;
 		
@@ -685,6 +724,7 @@ static int Map[100] = {
 			}
 		}
 	//	if (alpha>beta) break;
+        }
 	}
 	
     return (alpha);
