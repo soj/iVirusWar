@@ -1,6 +1,6 @@
 iVirusWar game application
 
-![My image](soj.github.com/iVirusWar/imgages/iVirusWar.png)
+![My image](https://github.com/soj/iVirusWar/blob/master/iVirusWar/images/iVirusWar.png)
 
 =========
 
