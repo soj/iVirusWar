@@ -41,7 +41,6 @@ typedef struct {
 	int n_compvir,n_humanvir,n_compkill,n_humankill;
 }
 
-
 -(id)init;
 -(void)markBestLine;
 -(int)evaluateBoard:(int)side;

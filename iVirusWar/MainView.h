@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 
 @interface MainView : UIView {
+
 	Virus *myboard;
 	BOOL firstMove;
 	int moveNumber;

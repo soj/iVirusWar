@@ -40,60 +40,40 @@ static int Map[100] = {
 	195,196,197,198,199,200,201,202,203,204
 };	
 
-//TODO:потом сделать инициализацию массива через циклы и SetupBoard
+#define maxThinkingTimeSec 100
 
-//static int tempPos[10][10] = {
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0},
-//	{0,0,0,0,0,0,0,0,0,0}
-//};
-//
-//static int recoMoves[10][10] = {
-//	{1,2,3,4,5,6,7,8,9,10},
-//	{2,11,12,13,14,15,16,17,18,19},
-//	{3,12,21,22,23,24,25,26,27,28},
-//	{4,13,22,31,32,33,34,35,36,37},
-//	{5,14,23,32,41,42,43,44,45,46},
-//	{6,15,24,33,42,51,52,53,54,55},
-//	{7,16,25,34,43,52,61,62,63,64},
-//	{8,17,26,35,44,53,62,71,72,73},
-//	{9,18,27,36,45,54,63,72,81,82},
-//	{10,19,28,37,46,55,64,73,82,91}
-//};
-
-/****************** PathFindNode <--- Object that holds node information (cost, x, y, etc.) */
 @interface PathFindNode : NSObject {
 @public
 	int nodePos;
 	int cost;
 	PathFindNode *parentNode;
 }
+
 +(id)node;
+
 @end
+
 @implementation PathFindNode
+
 +(id)node
 {
 	return [[PathFindNode alloc] init];
 }
 @end
 
-/*********************************************************************************/
 
-/****************** PathFindNode <--- Object that holds node information (cost, x, y, etc.) */
 @interface MoveLine : NSObject {
+
 @public
 	int Pos1,Pos2,Pos3,posSum;
 }
+
 +(id)line;
+
 @end
+
 @implementation MoveLine
+
 +(id)line
 {
 	return [[MoveLine alloc] init];
@@ -123,7 +103,6 @@ static int Map[100] = {
 @end
 
 /*********************************************************************************/
-
 
 @implementation Virus
 
@@ -231,7 +210,6 @@ static int Map[100] = {
 	if(startPos==endPos)
 		return YES;
 	
-	// сохранили че там было пока не понятно зачем
 	int saveTile=boardPos[endPos];
 	
 	boardPos[endPos]=TILE_TEMP;
@@ -257,7 +235,7 @@ static int Map[100] = {
 		
 		if(currentNode->nodePos == endPos)
 		{			
-			// PATH FOUND 	
+			// path found
 			boardPos[endPos]=saveTile;
 			
 			return YES;
@@ -267,11 +245,11 @@ static int Map[100] = {
 			[closedList addObject: currentNode];
 			[openList removeObject: currentNode];
 			currentPos = currentNode->nodePos;
-			//check all the surrounding nodes/tiles:
-			for(PosN=0;PosN<8;PosN++)
+
+            for(PosN=0;PosN<8;PosN++)
 			{
 				newPos = currentPos+addPos[PosN];
-				//simple bounds check for the demo app's array
+
 				if(boardPos[newPos]!=0xf0)
 				{
 					if(![self nodeInArrayFast:openList withPos:newPos])
@@ -285,16 +263,12 @@ static int Map[100] = {
 								aNode->parentNode = currentNode;
 								aNode->cost = currentNode->cost + 1;
 								
-								//Compute your cost here. This demo app uses a simple manhattan
-								//distance, added to the existing cost
-								
 								int newX = newPos%16;
 								int newY = newPos/16;
 								int endX = endPos%16;
 								int endY = endPos/16;
 								
 								aNode->cost += (abs((newX) - endX) + abs((newY) - endY));
-								//////////
 								
 								[openList addObject: aNode];
 							}
@@ -304,16 +278,12 @@ static int Map[100] = {
 			}
 		}		
 	}
+    
 	//  NO PATH FOUND 
 	boardPos[endPos]=saveTile;
 	
-	
-	//	NSLog (@"startNode after adding to array = %lx",(unsigned long) [startNode retainCount]);
-	
-	
 	return NO;
 }
-
 
 -(void)removeFreshes
 {
@@ -392,25 +362,22 @@ static int Map[100] = {
 {
 	int n,m,testPos,newPos;
 	BOOL found;
-	BOOL firstFound;
 	
 	int testCondition1,testCondition2,testCondition3;
 	
 	int addPos[8] = {1,-1,-15,-16,-17,15,16,17};
 	
-	if (side == 0) { //если ход компьютера  - 
+	if (side == 0) { // computer's move
 		testCondition1=TILE_HUMANVIR;
 		testCondition2=TILE_COMPVIR;
 		testCondition3=TILE_HUMANKILLED;
-	} else if (side == 1) {
+	} else  {
 		testCondition1=TILE_COMPVIR;
 		testCondition2=TILE_HUMANVIR;
 		testCondition3=TILE_COMPKILLED;
 	}
 	
-	firstFound=YES;
-	
-	NSMutableArray *myMoves;
+	NSMutableArray *myMoves = [[NSMutableArray alloc] init];
 	
 	for (testPos=0;testPos<100;testPos++) {
 		
@@ -418,46 +385,29 @@ static int Map[100] = {
 		
 		int whatInPos = boardPos[realPos];
 		
-		if (whatInPos == testCondition1 || whatInPos == TILE_EMPTY) {  // если ход возможен - пусто или можно слопать
+		if (whatInPos == testCondition1 || whatInPos == TILE_EMPTY) {  // if empty or we can eat opponent 
 			
 			for (m=0;m<8;m++) {
 				
 				newPos=realPos+addPos[m];
 				
-				if (boardPos[newPos]==testCondition2) { //ищем наш вирус живой поблизости
-					
-					if (firstFound) { //если нашли и массив еще не создан 
-						
-						// записываем одиночные ходы все которые мы можем сделать
-						myMoves=[[NSMutableArray alloc] initWithCapacity:10]; //создаем массив
-						firstFound=NO;
-					}
+				if (boardPos[newPos]==testCondition2) { // searching for living our virus nearby 
 					
 					PathFindNode *mNode = [PathFindNode node];
 					mNode->nodePos=testPos;
-					[myMoves addObject:mNode]; //добавляем ход
+					[myMoves addObject:mNode]; 
 					
-					
-					firstFound=NO;
 					break;
 					
-				} else if (boardPos[newPos]==testCondition3) { //если рядом с желаемой клеткой не живой наш вирус а мертвый
-					// то проверяем есть ли у него связь с большой землей
+				} else if (boardPos[newPos]==testCondition3) { // if dead virus nearby we test connection to living exists
 					
 					for (n=0; n<100; n++) {
 						
-						if (boardPos[Map[n]]==testCondition2) { //нашли настоящий вирус
+						if (boardPos[Map[n]]==testCondition2) { // we found living virus
 							
 							found = [self findPathFromPos:Map[n] To:newPos side:side];
 							
 							if (found == YES) {
-								
-								if (firstFound) {
-									
-									myMoves=[[NSMutableArray alloc] initWithCapacity:10];
-									firstFound=NO;
-									
-								}
 								
 								PathFindNode *mNode = [PathFindNode node];
 								mNode->nodePos=testPos;								
@@ -498,18 +448,18 @@ static int Map[100] = {
 	
 	MoveLine *mLine;
 	
-	int testCondition1,testCondition2,testCondition3;
+	int testCondition1;//,testCondition2,testCondition3;
 	
 	int addPos[8] = {1,-1,-15,-16,-17,15,16,17};
 	
-	if (side == 0) { //если ход компьютера  - 
+	if (side == 0) { // computer
 		testCondition1=TILE_HUMANVIR;
-		testCondition2=TILE_COMPVIR;
-		testCondition3=TILE_HUMANKILLED;
-	} else if (side == 1) {
+//		testCondition2=TILE_COMPVIR;
+//		testCondition3=TILE_HUMANKILLED;
+	} else {
 		testCondition1=TILE_COMPVIR;
-		testCondition2=TILE_HUMANVIR;
-		testCondition3=TILE_COMPKILLED;
+//		testCondition2=TILE_HUMANVIR;
+//		testCondition3=TILE_COMPKILLED;
 	}
 	
 	
@@ -525,9 +475,6 @@ static int Map[100] = {
 					if (thirdFirstMove->nodePos!=oneFirstMove->nodePos && thirdFirstMove->nodePos!=secondFirstMove->nodePos) {
 						sumPos=oneFirstMove->nodePos+secondFirstMove->nodePos+thirdFirstMove->nodePos;
                         
-                        //int arrayNumber = [self findSmallest:oneFirstMove->nodePos :secondFirstMove->nodePos :thirdFirstMove->nodePos];
-						
-//						if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
 							mLine=[MoveLine line];
 							
 							mLine->Pos1=oneFirstMove->nodePos;
@@ -536,8 +483,6 @@ static int Map[100] = {
 							mLine->posSum=sumPos;
 							
 							[secondMoves addObject:mLine];
-
-//						}
 					}
 				}
 			}
@@ -563,7 +508,6 @@ static int Map[100] = {
 							
 							sumPos=oneFirstMove->nodePos+[self unmapPosition:newPos]+thirdFirstMove->nodePos;
 							
-//							if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
 								mLine=[MoveLine line];
 								
 								mLine->Pos1=oneFirstMove->nodePos;
@@ -572,8 +516,6 @@ static int Map[100] = {
 								mLine->posSum=sumPos;
 								
 								[secondMoves addObject:mLine];
-								
-//							}
 						}
 					}
 					
@@ -586,8 +528,6 @@ static int Map[100] = {
 								
 								sumPos=oneFirstMove->nodePos+[self unmapPosition:newPos]+[self unmapPosition:newPos3];
 								
-//								if (![self lineInArrayFast:secondMoves withPos:sumPos]) {
-									
 									mLine=[MoveLine line];
 									
 									mLine->Pos1=oneFirstMove->nodePos;
@@ -597,7 +537,6 @@ static int Map[100] = {
 									
 									
 									[secondMoves addObject:mLine];
-//								}
 							}
 						}
 					}
@@ -607,13 +546,9 @@ static int Map[100] = {
 		}			
 	}
 	
-	
-//	[self testMoves2:secondMoves];
-    
     NSMutableArray *array = [self removeDuplicates:secondMoves];
 	
 	return (array);
-	
 }
 
 -(NSMutableArray *)removeDuplicates:(NSMutableArray*)originalArray
@@ -626,6 +561,7 @@ static int Map[100] = {
             [filteredArray addObject:object];
         }
     }
+    
     return filteredArray;
 }
 
@@ -633,7 +569,7 @@ static int Map[100] = {
 -(int)searchPositionAlpha:(int)alpha beta:(int)beta depth:(int)ply side:(int)side
 {
 	int pos1,pos2,pos3;
-	int tempMark1, tempMark2, testCondition1;
+	int tempMark1, tempMark2;//, testCondition1;
 	int oppside;
 		
 	if (ply == 2) // (ply == MAXPLY)
@@ -649,27 +585,18 @@ static int Map[100] = {
 		oppside = COMP_PLAYER;
 	}
 	
-    NSDate *date = [NSDate date];
+//    NSDate *date = [NSDate date];
     
 	NSMutableArray *allLines=[self fillSecondMovesArrays:side];
     
-    NSDate *date2 = [NSDate date];
-    NSLog(@"%f",[date2 timeIntervalSinceDate:date]);
+//    NSDate *date2 = [NSDate date];
+//    NSLog(@"%f",[date2 timeIntervalSinceDate:date]);
     
-	
-//	[self reportLines:allLines side:side];
-		
-//	int depth=20;
-	
-//	if (depth>countLines) depth=countLines;
-	
-//	for (m=0;m<countLines;m++) {		
-
 	for (MoveLine *mLine in allLines) {
         
         @autoreleasepool {
 
-		if ([startDate timeIntervalSinceNow] < -1500)  break;
+		if ([startDate timeIntervalSinceNow] < -maxThinkingTimeSec)  break;
 		
 		pos1=mLine->Pos1;
 		pos2=mLine->Pos2;
@@ -679,14 +606,14 @@ static int Map[100] = {
 		int whatInCell2 = boardPos[Map[pos2]];
 		int whatInCell3 = boardPos[Map[pos3]];
 		
-		if (side == 0) { //если ход компьютера  - 
+		if (side == 0) { // computer
 			tempMark1=TILE_COMPVIR;
 			tempMark2=TILE_HUMANKILLED;
-			testCondition1=TILE_HUMANVIR;
-		} else if (side == 1) {
+//			testCondition1=TILE_HUMANVIR;
+		} else {
 			tempMark1=TILE_HUMANVIR;
 			tempMark2=TILE_COMPKILLED;
-			testCondition1=TILE_COMPVIR;
+//			testCondition1=TILE_COMPVIR;
 		}
 
 		if (whatInCell1 == TILE_EMPTY)

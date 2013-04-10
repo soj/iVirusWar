@@ -31,15 +31,13 @@
     
     counter=1;
 
-	// начальная клетка без нее пока не работает поиск
+	// mark starting point for searching algorithm
 	[myboard markSpaceAtScreenPos:99 withFigure:TILE_HUMANVIR];
 }
 
 
 - (void)drawRect:(CGRect)rect {
-    // Drawing code
-	// Drawing code
-	
+ 
 	int n,x,y;
 	int starty=70;
 	
@@ -52,7 +50,7 @@
 	
 	context = UIGraphicsGetCurrentContext ();
 	
-	// рисуем линии
+	// lines
 	
 	CGContextSetLineWidth(context, 1.0);
 	UIColor *currentColor = [UIColor whiteColor];
@@ -73,8 +71,6 @@
 		CGContextStrokePath(context);
 		
 	}
-
-	//здесь написать количество взятых фигур
 	
 	compvirLabel.text=@"01";
 	compkillLabel.text=@"01";
@@ -133,10 +129,8 @@
 	humanLabel.text = [NSString stringWithFormat:@"%d",humanvir];
 	compkillLabel.text = [NSString stringWithFormat:@"%d",compkill];
 	humankillLabel.text = [NSString stringWithFormat:@"%d",humankill];
-    
-    
-    
-}	
+
+}
 
 
 -(void)searchAndMakeMove
@@ -153,24 +147,7 @@
 		[myboard markSpaceAtScreenPos:22 withFigure:TILE_COMPVIR];
 		
 		moveNumber++;
-//		
-//	} else if (moveNumber==11111) {
-//		
-//		[myboard markSpaceAtX:0 andY:1 withFigure:TILE_COMPVIR];
-//		[myboard markSpaceAtX:0 andY:2 withFigure:TILE_COMPVIR];
-//		[myboard markSpaceAtX:0 andY:3 withFigure:TILE_COMPVIR];
-//		
-//		moveNumber++;
-//		
-//		
-//	} else if (moveNumber==10000) {
-//		
-//		[myboard markSpaceAtX:1 andY:0 withFigure:TILE_COMPVIR];
-//		[myboard markSpaceAtX:2 andY:0 withFigure:TILE_COMPVIR];
-//		[myboard markSpaceAtX:3 andY:0 withFigure:TILE_COMPVIR];
-//		
-//		moveNumber++;
-//		
+
 	} else	 {
 	
 		[myboard timeSet];
@@ -178,8 +155,6 @@
 		[myboard markBestLine];
 	}
 	
-	//  [myboard testMoves];
-		
 	[myboard removeFreshes];
 
     [(UIActivityIndicatorView*)[self viewWithTag:111] stopAnimating];
@@ -188,7 +163,7 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-	CGPoint		touched;
+	CGPoint touched;
 	int what,mPos,sPos;
 	BOOL found;
 	
@@ -206,16 +181,16 @@
 		
 		int whatIn = [myboard whatInCellWithScreenPos:mPos];
 		
-		found = NO;
-		
 		if (whatIn == TILE_EMPTY || whatIn == TILE_COMPVIR) {
 			for(sPos=0;sPos<100;sPos++) {
+                
 				what = [myboard whatInCellWithScreenPos:sPos];
-				if (what == TILE_HUMANVIR) {
+				
+                if (what == TILE_HUMANVIR) {
 					
 					found = [myboard findPathFromScreenPos:sPos To:mPos side:HUMAN_PLAYER];
 					
-					if (found == YES) {
+					if (found) {
 						if (whatIn == TILE_EMPTY)
 							[myboard markSpaceAtScreenPos:mPos withFigure:TILE_HUMANVIR];
 						else 
